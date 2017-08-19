@@ -20,8 +20,21 @@ public class ExpressionParser {
         }
     }
 
-    private static String addImplicitMults(String s) {
-        String[] chunks = s.split("[A-z]")
+    public static String addImplicitMults(String s) {
+        // TODO: See if this actually works properly
+
+        int l = s.length();
+        int lMarker = 0;
+        String newString = "";
+        for (int i=0; i<l-1; i++) {
+            if ((Character.isDigit(s.charAt(i)) && Character.isAlphabetic(s.charAt(i+1))) ||
+                    (Character.isAlphabetic(s.charAt(i)) && Character.isAlphabetic(s.charAt(i+1)))) {
+                newString = newString + s.substring(lMarker, i+1) + "*";
+                lMarker = i+1;
+        }
+        }
+        newString += s.substring(lMarker);
+        return newString;
     }
 
     private ExpressionNode parseStringOp(String s, ExpressionNode p) throws ParseException {
@@ -114,6 +127,7 @@ public class ExpressionParser {
 
     ExpressionNode parseString(String s) throws ParseException {
         s = s.replace(" ", "");
+        s = addImplicitMults(s);
         ExpressionNode firstTerm = parseStringTerm(s);
         ExpressionNode parseTree = parseStringOp(s.substring(firstTerm.v.length()), firstTerm);
         return expandParseTree(parseTree);
